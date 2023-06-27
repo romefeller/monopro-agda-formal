@@ -57,6 +57,10 @@ mfoldl : {a b : Set} -> Moore a b -> SISO a b
 mfoldl m = siso (λ ls -> runMooref m ls)
 
 -- mfoldl is a natural transformation
+lemma6-ind : ∀ {a b c d : Set} (f : a -> b) (g : c -> d) (x : c) (h : b -> Moore b c) (ls : List a) -> runMooref (dimapMoore f g (moore x h)) ls ≡ (g ∘ runMooref (moore x h) ∘ Data.List.map f) ls
+lemma6-ind f g x h [] = refl
+lemma6-ind f g x h (l ∷ ls) = {!!}
+
 lemma6 : ∀ {a b c d : Set} (f : a -> b) (g : c -> d) (m : Moore b c) -> mfoldl (dimapMoore f g m) ≡ dimapSISO f g (mfoldl m)
 lemma6 f g (moore x h) = {!!}
 
@@ -67,15 +71,15 @@ f <$> ls = Data.List.map f ls
 -- This lemma serves as a readability aid by employing function extensionality 
 -- on a polymorphic list. Our strategy is straightforward: we perform structural 
 -- induction on the Moore type.
-helper : {a b c d : Set}(m : Moore a b)(n : Moore c d)
+lemma3-ind : {a b c d : Set}(m : Moore a b)(n : Moore c d)
          -> (λ ls -> runMooref (m >***< n) ls) ≡≡ (λ ls -> ((runMooref m (proj₁ (unzip ls))) , (runMooref n (proj₂ (unzip ls)))))
-helper (moore x _) (moore y _) [] = refl
-helper (moore _ am) (moore _ bm) (x ∷ zs) = helper (am (proj₁ x)) (bm (proj₂ x)) zs
+lemma3-ind (moore x _) (moore y _) [] = refl
+lemma3-ind (moore _ am) (moore _ bm) (x ∷ zs) = lemma3-ind (am (proj₁ x)) (bm (proj₂ x)) zs
 
 -- This lemma, referred to as Lemma 6 in the accompanying text, asserts that the
 -- function mfoldl preserves the structure of the monoidal multiplication. To enhance
 -- readability and clarity of our code, we employ the above helper function in the proof of this lemma.
 lemma3 : {a b c d : Set}(m : Moore a b)(n : Moore c d) -> mfoldl (m >***< n) ≡ mfoldl m *** mfoldl n
-lemma3 m n = cong siso (funext (helper m n))
+lemma3 m n = cong siso (funext (lemma3-ind m n))
 
 
