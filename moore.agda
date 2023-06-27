@@ -9,6 +9,12 @@ open import Agda.Primitive
 
 infix 4 _≡≡_
 
+infixr 9 _∘_
+
+-- Function composition
+_∘_ : {A B C : Set} -> (B -> C) -> (A -> B) -> A -> C
+(g ∘ f) x = g (f x)
+
 -- Type constructor for functional equality
 _≡≡_ : ∀{A B : Set} ->  (A -> B) -> (A -> B) -> Set
 _≡≡_ {A} {B} f g = ∀(x : A) -> f x ≡ g x
@@ -33,13 +39,13 @@ moore x x₁ >***< moore y x₃ = moore (x , y) λ(a , c) -> x₁ a >***< x₃ c
 _***_ : {a b c d : Set } -> SISO a b -> SISO c d -> SISO (a × c) (b × d)
 siso x *** siso y = siso (λ ls -> let (les , res) = unzip ls in (x les , y res) )
 
--- Profunctor instance
-record Profunctor (p : Set -> Set -> Set) : Set₁ where
-   field
-       dimap : {a b c d : Set} -> (a -> b) -> (c -> d) -> p b c -> p a d
+-- Moore is a Profunctor
+dimapMoore : {a b c d : Set} -> (a -> b) -> (c -> d) -> Moore b c -> Moore a d
+dimapMoore f g (moore x h) = moore (g x) (λ y → dimapMoore f g (h (f y)))
 
-mooreProf : Profunctor Moore
-mooreProf = {!!}
+-- SISO is also a Profunctor
+dimapSISO : {a b c d : Set} -> (a -> b) -> (c -> d) -> SISO b c -> SISO a d
+dimapSISO f g (siso h) = siso (g ∘ h ∘ Data.List.map f)
 
 -- Running a Moore machine
 runMooref : {a b : Set} ->  Moore a b -> List a -> b
@@ -49,6 +55,10 @@ runMooref (moore x f) (l ∷ ls) = runMooref (f l) ls
 -- The fold function using the Moore-SISO natural transformation
 mfoldl : {a b : Set} -> Moore a b -> SISO a b
 mfoldl m = siso (λ ls -> runMooref m ls)
+
+-- mfoldl is a natural transformation
+lemma6 : ∀ {a b c d : Set} (f : a -> b) (g : c -> d) (h : b -> Moore b c) (x : c) → mfoldl (dimapMoore f g (moore x h)) ≡ dimapSISO f g (mfoldl (moore x h))
+lemma6 f g h x = {!!}
 
 -- This is just the map function
 _<$>_ : {A B : Set} -> (A -> B) -> List A -> List B
