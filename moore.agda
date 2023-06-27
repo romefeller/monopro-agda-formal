@@ -57,13 +57,14 @@ mfoldl : {a b : Set} -> Moore a b -> SISO a b
 mfoldl m = siso (λ ls -> runMooref m ls)
 
 -- mfoldl is a natural transformation. This is a helper function.
-lemma6-ind : ∀ {a b c d : Set} (f : a -> b) (g : c -> d) (x : c) (h : b -> Moore b c) (ls : List a) -> runMooref (dimapMoore f g (moore x h)) ls ≡ (g ∘ runMooref (moore x h) ∘ Data.List.map f) ls
-lemma6-ind f g x h [] = refl
-lemma6-ind f g x h (l ∷ ls) = {!!}
+lemma6-ind : ∀ {a b c d : Set} (f : a -> b) (g : c -> d) (m : Moore b c) (ls : List a) -> runMooref (dimapMoore f g m) ls ≡ (g ∘ runMooref m ∘ Data.List.map f) ls
+lemma6-ind f g (moore x h) [] = cong g refl
+lemma6-ind f g (moore x h) (l ∷ ls) = lemma6-ind f g (h (f l)) ls
 
--- mfoldl is a natural transformation
+-- mfoldl is a natural transformation. This proof also uses function
+-- extensionality.
 lemma6 : ∀ {a b c d : Set} (f : a -> b) (g : c -> d) (m : Moore b c) -> mfoldl (dimapMoore f g m) ≡ dimapSISO f g (mfoldl m)
-lemma6 f g (moore x h) = cong siso (funext (lemma6-ind f g x h))
+lemma6 f g m = cong siso (funext (lemma6-ind f g m))
 
 -- This is just the map function
 _<$>_ : {A B : Set} -> (A -> B) -> List A -> List B
