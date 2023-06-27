@@ -57,8 +57,8 @@ mfoldl : {a b : Set} -> Moore a b -> SISO a b
 mfoldl m = siso (λ ls -> runMooref m ls)
 
 -- mfoldl is a natural transformation
-lemma6 : ∀ {a b c d : Set} (f : a -> b) (g : c -> d) (h : b -> Moore b c) (x : c) → mfoldl (dimapMoore f g (moore x h)) ≡ dimapSISO f g (mfoldl (moore x h))
-lemma6 f g h x = {!!}
+lemma6 : ∀ {a b c d : Set} (f : a -> b) (g : c -> d) (m : Moore b c) -> mfoldl (dimapMoore f g m) ≡ dimapSISO f g (mfoldl m)
+lemma6 f g (moore x h) = {!!}
 
 -- This is just the map function
 _<$>_ : {A B : Set} -> (A -> B) -> List A -> List B
