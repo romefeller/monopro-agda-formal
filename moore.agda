@@ -74,7 +74,7 @@ f <$> ls = Data.List.map f ls
 -- on a polymorphic list. Our strategy is straightforward: we perform structural 
 -- induction on the Moore type.
 lemma3-ind : {a b c d : Set}(m : Moore a b)(n : Moore c d)
-         -> (λ ls -> runMooref (m >***< n) ls) ≡≡ (λ ls -> ((runMooref m (proj₁ (unzip ls))) , (runMooref n (proj₂ (unzip ls)))))
+         (ls : List (a × c)) -> runMooref (m >***< n) ls ≡ ((runMooref m (proj₁ (unzip ls))) , (runMooref n (proj₂ (unzip ls))))
 lemma3-ind (moore x _) (moore y _) [] = refl
 lemma3-ind (moore _ am) (moore _ bm) (x ∷ zs) = lemma3-ind (am (proj₁ x)) (bm (proj₂ x)) zs
 
