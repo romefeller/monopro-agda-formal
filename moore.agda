@@ -49,7 +49,7 @@ dimapSISO f g (siso h) = siso (g ∘ h ∘ Data.List.map f)
 
 -- Running a Moore machine
 runMooref : {a b : Set} ->  Moore a b -> List a -> b
-runMooref (moore x x₁) [] = x
+runMooref (moore x _) [] = x
 runMooref (moore x f) (l ∷ ls) = runMooref (f l) ls
 
 -- The fold function using the Moore-SISO natural transformation
